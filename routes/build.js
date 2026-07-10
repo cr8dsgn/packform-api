@@ -10,6 +10,11 @@ router.post("/", (req, res) => {
     console.log("BODY:");
     console.log(req.body);
 
+    const { dimensionsMm } = req.body;
+
+console.log("Dimensions:");
+console.log(dimensionsMm);
+
     res.json({
         success: true
     });
