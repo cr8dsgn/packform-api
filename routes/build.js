@@ -4,8 +4,11 @@ const router = express.Router();
 
 router.post("/", (req, res) => {
 
-    console.log("PACKFORM REQUEST:");
-    console.log(JSON.stringify(req.body, null, 2));
+    console.log("HEADERS:");
+    console.log(req.headers);
+
+    console.log("BODY:");
+    console.log(req.body);
 
     res.json({
         success: true
