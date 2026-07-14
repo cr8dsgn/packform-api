@@ -10,11 +10,13 @@ function calculateRoundedBox(w, h, d, radius) {
 
         segments: segs,
 
-        halfWidth: w / 2,
+        inner: {
 
-        halfHeight: h / 2,
+            x: w / 2 - r,
+            y: h / 2 - r,
+            z: d / 2 - r
 
-        halfDepth: d / 2
+        }
 
     };
 
