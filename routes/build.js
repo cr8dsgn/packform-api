@@ -1,5 +1,6 @@
 const express = require("express");
 const geometry = require("../engine/geometry");
+const rounded = require("../engine/rounded");
 
 const router = express.Router();
 
@@ -21,6 +22,16 @@ const normalized = geometry.normalizeDimensions(
     dimensionsMm.y,
     dimensionsMm.z
 );
+
+const roundedData = rounded.calculateRoundedBox(
+    normalized.x,
+    normalized.y,
+    normalized.z,
+    req.body.studio.bevel
+);
+
+console.log("Rounded:");
+console.log(roundedData);
 
 console.log("Normalized:");
 console.log(normalized);
