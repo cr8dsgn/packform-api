@@ -38,7 +38,8 @@ console.log(normalized);
 
     res.json({
     success: true,
-    normalized
+    normalized,
+    rounded: roundedData
 });
 
 });
