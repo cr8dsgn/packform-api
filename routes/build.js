@@ -12,7 +12,13 @@ router.post("/", (req, res) => {
     console.log("BODY:");
     console.log(req.body);
 
-    const { dimensionsMm } = req.body;
+    const {
+    dimensionsMm,
+    studio,
+    export: exportOptions,
+    faces,
+    action
+} = req.body;
 
 console.log("Dimensions:");
 console.log(dimensionsMm);
@@ -27,7 +33,7 @@ const roundedData = rounded.calculateRoundedBox(
     normalized.x,
     normalized.y,
     normalized.z,
-    req.body.studio.bevel
+    studio.bevel
 );
 
 console.log("Rounded:");
@@ -36,8 +42,16 @@ console.log(roundedData);
 console.log("Normalized:");
 console.log(normalized);
 
-    res.json({
+res.json({
     success: true,
+
+    request: {
+        action,
+        dimensionsMm,
+        studio,
+        export: exportOptions
+    },
+
     normalized,
     rounded: roundedData
 });
