@@ -12,8 +12,34 @@ function normalizeDimensions(x, y, z) {
 
 }
 
+function calculateHalfSizes(size) {
+
+    return {
+
+        halfWidth: size.x / 2,
+        halfHeight: size.y / 2,
+        halfDepth: size.z / 2
+
+    };
+
+}
+
+function buildGeometryData(normalized) {
+
+    return {
+
+        size: normalized,
+
+        half: calculateHalfSizes(normalized)
+
+    };
+
+}
+
 module.exports = {
 
-    normalizeDimensions
+    normalizeDimensions,
+    calculateHalfSizes,
+    buildGeometryData
 
 };

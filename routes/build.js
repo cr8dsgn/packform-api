@@ -29,6 +29,8 @@ const normalized = geometry.normalizeDimensions(
     dimensionsMm.z
 );
 
+const geometryData = geometry.buildGeometryData(normalized);
+
 const roundedData = rounded.calculateRoundedBox(
     normalized.x,
     normalized.y,
@@ -52,6 +54,7 @@ res.json({
         export: exportOptions
     },
 
+    geometry: geometryData,
     normalized,
     rounded: roundedData
 });
