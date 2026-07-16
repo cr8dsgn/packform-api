@@ -24,13 +24,39 @@ function calculateHalfSizes(size) {
 
 }
 
+function calculateBounds(size) {
+
+    return {
+
+        min: {
+
+            x: -size.x / 2,
+            y: -size.y / 2,
+            z: -size.z / 2
+
+        },
+
+        max: {
+
+            x: size.x / 2,
+            y: size.y / 2,
+            z: size.z / 2
+
+        }
+
+    };
+
+}
+
 function buildGeometryData(normalized) {
 
     return {
 
-        size: normalized,
+    size: normalized,
 
-        half: calculateHalfSizes(normalized)
+    half: calculateHalfSizes(normalized),
+
+    bounds: calculateBounds(normalized)
 
     };
 
@@ -40,6 +66,7 @@ module.exports = {
 
     normalizeDimensions,
     calculateHalfSizes,
+    calculateBounds,
     buildGeometryData
 
 };
