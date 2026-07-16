@@ -29,13 +29,16 @@ const normalized = geometry.normalizeDimensions(
     dimensionsMm.z
 );
 
-const geometryData = geometry.buildGeometryData(normalized);
-
 const roundedData = rounded.calculateRoundedBox(
     normalized.x,
     normalized.y,
     normalized.z,
     studio.bevel
+);
+
+const geometryData = geometry.buildGeometryData(
+    normalized,
+    roundedData
 );
 
 console.log("Rounded:");

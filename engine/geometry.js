@@ -48,7 +48,23 @@ function calculateBounds(size) {
 
 }
 
-function buildGeometryData(normalized) {
+function buildMeshDescriptor(size, rounded) {
+
+    return {
+
+        width: size.x,
+        height: size.y,
+        depth: size.z,
+
+        bevelRadius: rounded.radius,
+
+        segments: rounded.segments
+
+    };
+
+}
+
+function buildGeometryData(normalized, rounded) {
 
     return {
 
@@ -56,8 +72,10 @@ function buildGeometryData(normalized) {
 
     half: calculateHalfSizes(normalized),
 
-    bounds: calculateBounds(normalized)
+    bounds: calculateBounds(normalized),
 
+    mesh: buildMeshDescriptor(normalized, rounded)
+    
     };
 
 }
@@ -67,6 +85,7 @@ module.exports = {
     normalizeDimensions,
     calculateHalfSizes,
     calculateBounds,
+    buildMeshDescriptor,
     buildGeometryData
 
 };
