@@ -28,12 +28,17 @@ async function register(req, res) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-
+    
+    const isFirstUser = database.data.users.length === 0;
+    
     const user = new User({
         id: crypto.randomUUID(),
         name,
         email,
-        passwordHash
+        passwordHash,
+
+        role: isFirstUser ? "Admin" : "Tester",
+        status: isFirstUser ? "Active" : "Pending"
     });
 
     database.data.users.push(user);
