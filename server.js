@@ -4,6 +4,7 @@ const rateLimit = require("express-rate-limit");
 
 const buildRoute = require("./routes/build");
 const authRoute = require("./routes/auth");
+const adminRoute = require("./routes/admin");
 
 const app = express();
 const API_KEY = process.env.API_KEY || "packform_dev_key";
@@ -62,6 +63,7 @@ app.use((req, res, next) => {
 
 app.use("/api/build", buildRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/admin", adminRoute);
 
 app.get("/health", (req, res) => {
     res.json({

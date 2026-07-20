@@ -1,32 +1,3 @@
-{
-  "users": [
-    {
-      "id": "8662c1a9-628e-40f3-8281-e434378208fe",
-      "name": "Behruz",
-      "email": "behruz@test.com",
-      "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
-      "role": "Tester",
-      "status": "Pending",
-      "buildLimit": 0,
-      "exportLimit": 0,
-      "buildsUsed": 0,
-      "exportsUsed": 0,
-      "createdAt": "2026-07-20T06:02:39.791Z",
-      "lastLogin": null
-    },
-    {
-      "id": "832346c5-df44-4c34-b57e-b07a4d8bb8cc",
-      "name": "Test User",
-      "email": "test2@test.com",
-      "passwordHash": "$2b$10$u6FrBGdeU77sv06EyH/3Ye45PzCUP75m1LL294jtmwlVeBpH2hO8q",
-      "role": "Tester",
-      "status": "Pending",
-      "buildLimit": 0,
-      "exportLimit": 0,
-      "buildsUsed": 0,
-      "exportsUsed": 0,
-      "createdAt": "2026-07-20T06:10:21.272Z",
-      "lastLogin": null
-    }
-  ]
-}
+git add .
+git commit -m "Complete authentication and admin approval"
+git push
