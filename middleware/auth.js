@@ -1,6 +1,7 @@
 const { verifyToken } = require("../utils/jwt");
+const userService = require("../services/userService");
 
-function auth(req, res, next) {
+async function auth(req, res, next) {
 
     const authHeader = req.headers.authorization;
 
@@ -15,7 +16,28 @@ function auth(req, res, next) {
 
     try {
 
-        req.user = verifyToken(token);
+        const payload = verifyToken(token);
+
+        const user = await userService.getUserById(
+            payload.id
+        );
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        if (user.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message: "User is blocked",
+                status: user.status
+            });
+        }
+
+        req.user = user;
 
         next();
 

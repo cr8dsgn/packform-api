@@ -3,10 +3,12 @@ const userService = require("./userService");
 function createUsage(user) {
 
     return {
+
         buildsUsed: user.buildsUsed,
         buildLimit: user.buildLimit,
+
         remainingBuilds:
-            user.buildLimit === 0
+            user.buildLimit === -1
                 ? null
                 : Math.max(
                     0,
@@ -15,13 +17,15 @@ function createUsage(user) {
 
         exportsUsed: user.exportsUsed,
         exportLimit: user.exportLimit,
+
         remainingExports:
-            user.exportLimit === 0
+            user.exportLimit === -1
                 ? null
                 : Math.max(
                     0,
                     user.exportLimit - user.exportsUsed
                 )
+
     };
 
 }
@@ -41,7 +45,7 @@ async function checkLimit(userId, type) {
     if (type === "build") {
 
         if (
-            user.buildLimit > 0 &&
+            user.buildLimit !== -1 &&
             user.buildsUsed >= user.buildLimit
         ) {
 
@@ -59,7 +63,7 @@ async function checkLimit(userId, type) {
     if (type === "export") {
 
         if (
-            user.exportLimit > 0 &&
+            user.exportLimit !== -1 &&
             user.exportsUsed >= user.exportLimit
         ) {
 
