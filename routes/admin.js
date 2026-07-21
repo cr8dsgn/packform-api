@@ -11,4 +11,10 @@ router.post(
     adminController.approveUser
 );
 
+router.post(
+    "/limits",
+    adminAuth,
+    adminController.setLimits
+);
+
 module.exports = router;

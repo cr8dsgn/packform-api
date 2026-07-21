@@ -1,14 +1,14 @@
 const express = require("express");
 
 const auth = require("../middleware/auth");
-const buildController = require("../controllers/buildController");
+const exportController = require("../controllers/exportController");
 
 const router = express.Router();
 
 router.post(
     "/",
     auth,
-    buildController.build
+    exportController.exportModel
 );
 
 module.exports = router;
