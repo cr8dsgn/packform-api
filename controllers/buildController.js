@@ -1,21 +1,7 @@
 const geometry = require("../engine/geometry");
 const rounded = require("../engine/rounded");
 
-const buildService = require("../services/buildService");
-
 async function build(req, res) {
-
-    const limit = await buildService.checkBuildLimit(
-        req.user.id
-    );
-
-    if (!limit.success) {
-        return res.status(limit.status).json({
-            success: false,
-            message: limit.message,
-            usage: limit.usage ?? null
-        });
-    }
 
     const {
         dimensionsMm,
@@ -42,10 +28,6 @@ async function build(req, res) {
         roundedData
     );
 
-    const usage = await buildService.incrementBuild(
-        req.user.id
-    );
-
     return res.json({
         success: true,
 
@@ -58,9 +40,7 @@ async function build(req, res) {
 
         geometry: geometryData,
         normalized,
-        rounded: roundedData,
-
-        usage
+        rounded: roundedData
     });
 
 }
