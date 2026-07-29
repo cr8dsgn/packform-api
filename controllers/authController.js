@@ -17,6 +17,10 @@ async function register(req, res) {
     }
 
     const database = await db;
+
+    console.log("USERS:", database.data.users.map(u => u.email));
+    console.log("REGISTER EMAIL:", email);
+    
     const exists = database.data.users.find(
     user => user.email === email
 );
@@ -84,7 +88,7 @@ async function login(req, res) {
     if (user.status !== "Active") {
         return res.status(403).json({
             success: false,
-            message: "Account is not active",
+            message: "Your account is pending administrator approval.",
             status: user.status
         });
     }
