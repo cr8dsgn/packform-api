@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
-const db = require("../utils/db");
+const userRepository = require("../repositories/userRepository");
 const { generateToken } = require("../utils/jwt");
 
 async function register(req, res) {
@@ -16,14 +16,8 @@ async function register(req, res) {
         });
     }
 
-    const database = await db;
+    const exists = await userRepository.findByEmail(email);
 
-    console.log("USERS:", database.data.users.map(u => u.email));
-    console.log("REGISTER EMAIL:", email);
-    
-    const exists = database.data.users.find(
-    user => user.email === email
-);
     if (exists) {
         return res.status(409).json({
             success: false,
@@ -32,9 +26,11 @@ async function register(req, res) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    
-    const isFirstUser = database.data.users.length === 0;
-    
+
+    const userCount = await userRepository.countUsers();
+
+    const isFirstUser = userCount === 0;
+
     const user = new User({
         id: crypto.randomUUID(),
         name,
@@ -42,11 +38,13 @@ async function register(req, res) {
         passwordHash,
 
         role: isFirstUser ? "Admin" : "Tester",
-        status: isFirstUser ? "Active" : "Pending"
+        status: isFirstUser ? "Active" : "Pending",
+
+        buildLimit: -1,
+        exportLimit: -1
     });
 
-    database.data.users.push(user);
-    await database.write();
+    await userRepository.create(user);
 
     return res.status(201).json({
         success: true,
@@ -60,11 +58,15 @@ async function login(req, res) {
 
     const { email, password } = req.body;
 
-    const database = await db;
+    const user = await userRepository.findByEmail(email);
 
-    const user = database.data.users.find(
-        user => user.email === email
-    );
+    console.log("========== LOGIN ==========");
+    console.log("EMAIL:", email);
+    console.log("USER FOUND:", !!user);
+
+    if (user) {
+    console.log("DB EMAIL:", user.email);
+    }
 
     if (!user) {
         return res.status(401).json({
@@ -75,8 +77,10 @@ async function login(req, res) {
 
     const passwordValid = await bcrypt.compare(
         password,
-        user.passwordHash
+        user.password
     );
+
+    console.log("PASSWORD VALID:", passwordValid);
 
     if (!passwordValid) {
         return res.status(401).json({
@@ -93,11 +97,14 @@ async function login(req, res) {
         });
     }
 
-    user.lastLogin = new Date();
+    await userRepository.updateLastLogin(user.id);
 
-    await database.write();
-
-    const token = generateToken(user);
+    const token = generateToken({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        status: user.status
+    });
 
     return res.json({
         success: true,
