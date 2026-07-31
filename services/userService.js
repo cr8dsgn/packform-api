@@ -1,75 +1,64 @@
-const db = require("../utils/db");
-
-async function getDatabase() {
-    return await db;
-}
+const pool = require("../utils/postgres");
 
 async function getUserById(id) {
-
-    const database = await getDatabase();
-
-    return database.data.users.find(
-        user => user.id === id
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM users
+        WHERE id = $1
+        `,
+        [id]
     );
 
+    return result.rows[0] || null;
 }
 
 async function getUserByEmail(email) {
-
-    const database = await getDatabase();
-
-    return database.data.users.find(
-        user => user.email === email
+    const result = await pool.query(
+        `
+        SELECT *
+        FROM users
+        WHERE email = $1
+        `,
+        [email]
     );
 
-}
-
-async function save() {
-
-    const database = await getDatabase();
-
-    await database.write();
-
+    return result.rows[0] || null;
 }
 
 async function approveUser(email) {
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET status = 'Active'
+        WHERE email = $1
+        RETURNING *
+        `,
+        [email]
+    );
 
-    const user = await getUserByEmail(email);
-
-    if (!user) {
-        return null;
-    }
-
-    user.status = "Active";
-
-    await save();
-
-    return user;
-
+    return result.rows[0] || null;
 }
 
 async function setLimits(email, buildLimit, exportLimit) {
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET
+            build_limit = $2,
+            export_limit = $3
+        WHERE email = $1
+        RETURNING *
+        `,
+        [email, buildLimit, exportLimit]
+    );
 
-    const user = await getUserByEmail(email);
-
-    if (!user) {
-        return null;
-    }
-
-    user.buildLimit = buildLimit;
-    user.exportLimit = exportLimit;
-
-    await save();
-
-    return user;
-
+    return result.rows[0] || null;
 }
 
 module.exports = {
-    getDatabase,
     getUserById,
     getUserByEmail,
-    save,
     approveUser,
     setLimits
 };
