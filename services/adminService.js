@@ -1,123 +1,11 @@
-const userService = require("./userService");
+const userRepository = require("../repositories/userRepository");
 
-async function approveUser(email) {
-
-    const user = await userService.getUserByEmail(email);
-
-    if (!user) {
-        return null;
-    }
-
-    user.status = "Active";
-
-    await userService.save();
-
-    return user;
-
-}
-
-async function blockUser(email) {
-
-    const user = await userService.getUserByEmail(email);
-
-    if (!user) {
-        return null;
-    }
-
-    user.status = "Blocked";
-
-    await userService.save();
-
-    return user;
-
-}
-
-async function unblockUser(email) {
-
-    const user = await userService.getUserByEmail(email);
-
-    if (!user) {
-        return null;
-    }
-
-    user.status = "Active";
-
-    await userService.save();
-
-    return user;
-
-}
-
-async function resetUsage(email) {
-
-    const user = await userService.getUserByEmail(email);
-
-    if (!user) {
-        return null;
-    }
-
-    user.buildsUsed = 0;
-    user.exportsUsed = 0;
-
-    await userService.save();
-
-    return user;
-
-}
-
-async function setLimits(email, buildLimit, exportLimit) {
-
-    const user = await userService.getUserByEmail(email);
-
-    if (!user) {
-        return null;
-    }
-
-    user.buildLimit = buildLimit;
-    user.exportLimit = exportLimit;
-
-    await userService.save();
-
-    return user;
-
-}
-
-async function getUsers() {
-
-    const database = await userService.getDatabase();
-
-    return database.data.users.map(user => ({
-
-        id: user.id,
-        name: user.name,
-        email: user.email,
-
-        role: user.role,
-        status: user.status,
-
-        buildLimit: user.buildLimit,
-        exportLimit: user.exportLimit,
-
-        buildsUsed: user.buildsUsed,
-        exportsUsed: user.exportsUsed,
-
-        createdAt: user.createdAt,
-        lastLogin: user.lastLogin
-
-    }));
-
-}
-
-async function getUserById(id) {
-
-    const user = await userService.getUserById(id);
-
+function mapUser(user) {
     if (!user) {
         return null;
     }
 
     return {
-
         id: user.id,
         name: user.name,
         email: user.email,
@@ -125,16 +13,115 @@ async function getUserById(id) {
         role: user.role,
         status: user.status,
 
-        buildLimit: user.buildLimit,
-        exportLimit: user.exportLimit,
+        buildLimit: user.build_limit,
+        exportLimit: user.export_limit,
 
-        buildsUsed: user.buildsUsed,
-        exportsUsed: user.exportsUsed,
+        buildsUsed: user.builds_used,
+        exportsUsed: user.exports_used,
 
-        createdAt: user.createdAt,
-        lastLogin: user.lastLogin
-
+        createdAt: user.created_at,
+        lastLogin: user.last_login
     };
+}
+
+async function getUsers() {
+
+    const users = await userRepository.findAll();
+
+    return users.map(mapUser);
+
+}
+
+async function getUserById(id) {
+
+    const user = await userRepository.findById(id);
+
+    return mapUser(user);
+
+}
+
+async function approveUser(email) {
+
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    const updated = await userRepository.updateStatus(
+        user.id,
+        "Active"
+    );
+
+    return mapUser(updated);
+
+}
+
+async function blockUser(email) {
+
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    const updated = await userRepository.updateStatus(
+        user.id,
+        "Blocked"
+    );
+
+    return mapUser(updated);
+
+}
+
+async function unblockUser(email) {
+
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    const updated = await userRepository.updateStatus(
+        user.id,
+        "Active"
+    );
+
+    return mapUser(updated);
+
+}
+
+async function resetUsage(email) {
+
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    const updated = await userRepository.resetUsage(
+        user.id
+    );
+
+    return mapUser(updated);
+
+}
+
+async function setLimits(email, buildLimit, exportLimit) {
+
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    const updated = await userRepository.updateLimits(
+        user.id,
+        buildLimit,
+        exportLimit
+    );
+
+    return mapUser(updated);
 
 }
 
