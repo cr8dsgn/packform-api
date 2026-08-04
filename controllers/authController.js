@@ -40,8 +40,8 @@ async function register(req, res) {
         role: isFirstUser ? "Admin" : "Tester",
         status: isFirstUser ? "Active" : "Pending",
 
-        buildLimit: -1,
-        exportLimit: -1
+        buildLimit: isFirstUser ? -1 : 3,
+        exportLimit: isFirstUser ? -1 : 3
     });
 
     await userRepository.create(user);

@@ -56,9 +56,43 @@ async function setLimits(email, buildLimit, exportLimit) {
     return result.rows[0] || null;
 }
 
+async function incrementBuildsUsed(id) {
+
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET builds_used = builds_used + 1
+        WHERE id = $1
+        RETURNING *
+        `,
+        [id]
+    );
+
+    return result.rows[0] || null;
+
+}
+
+async function incrementExportsUsed(id) {
+
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET exports_used = exports_used + 1
+        WHERE id = $1
+        RETURNING *
+        `,
+        [id]
+    );
+
+    return result.rows[0] || null;
+
+}
+
 module.exports = {
     getUserById,
     getUserByEmail,
     approveUser,
-    setLimits
+    setLimits,
+    incrementBuildsUsed,
+    incrementExportsUsed
 };

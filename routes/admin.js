@@ -47,4 +47,10 @@ router.post(
     adminController.setLimits
 );
 
+router.post(
+    "/delete",
+    adminAuth,
+    adminController.deleteUser
+);
+
 module.exports = router;

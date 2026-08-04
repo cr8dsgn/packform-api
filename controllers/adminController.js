@@ -145,12 +145,33 @@ async function setLimits(req, res) {
 
 }
 
+async function deleteUser(req, res) {
+
+    const { email } = req.body;
+
+    const user = await adminService.deleteUser(email);
+
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    return res.json({
+        success: true,
+        message: "User deleted"
+    });
+
+}
+
 module.exports = {
     getUsers,
     getUserById,
     approveUser,
     blockUser,
     unblockUser,
+    deleteUser,
     resetUsage,
     setLimits
 };

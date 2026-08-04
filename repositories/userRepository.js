@@ -111,12 +111,15 @@ async function updateStatus(id, status) {
 }
 
 async function updateLimits(id, buildLimit, exportLimit) {
+
     const result = await pool.query(
         `
         UPDATE users
         SET
             build_limit = $1,
-            export_limit = $2
+            export_limit = $2,
+            builds_used = 0,
+            exports_used = 0
         WHERE id = $3
         RETURNING *
         `,
@@ -124,6 +127,7 @@ async function updateLimits(id, buildLimit, exportLimit) {
     );
 
     return result.rows[0] || null;
+
 }
 
 async function resetUsage(id) {
@@ -153,6 +157,40 @@ async function updateLastLogin(id) {
     );
 }
 
+async function updatePlan(id, planId) {
+
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET
+            plan_id = $1,
+            builds_used = 0,
+            exports_used = 0
+        WHERE id = $2
+        RETURNING *
+        `,
+        [planId, id]
+    );
+
+    return result.rows[0] || null;
+
+}
+
+async function deleteByEmail(email) {
+
+    const result = await pool.query(
+        `
+        DELETE FROM users
+        WHERE email = $1
+        RETURNING *
+        `,
+        [email]
+    );
+
+    return result.rows[0] || null;
+
+}
+
 module.exports = {
     countUsers,
     findAll,
@@ -160,8 +198,10 @@ module.exports = {
     findByEmail,
     create,
     deleteById,
+    deleteByEmail,
     updateStatus,
     updateLimits,
+    updatePlan,
     resetUsage,
     updateLastLogin
 };

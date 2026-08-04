@@ -10,6 +10,7 @@ const authRoute = require("./routes/auth");
 const adminRoute = require("./routes/admin");
 const exportRoute = require("./routes/export");
 const userRoute = require("./routes/user");
+const plansRoute = require("./routes/plans");
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/admin", adminRoute);
 app.use("/api/export", exportRoute);
 app.use("/api/user", userRoute);
+app.use("/api/plans", plansRoute);
 
 app.get("/health", (req, res) => {
     res.json({

@@ -125,10 +125,23 @@ async function setLimits(email, buildLimit, exportLimit) {
 
 }
 
+async function deleteUser(email) {
+
+    const user = await userRepository.deleteByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    return mapUser(user);
+
+}
+
 module.exports = {
     approveUser,
     blockUser,
     unblockUser,
+    deleteUser,
     resetUsage,
     setLimits,
     getUsers,
