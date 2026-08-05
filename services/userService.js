@@ -1,6 +1,42 @@
 const pool = require("../utils/postgres");
 
+function mapUser(user) {
+
+    if (!user) {
+        return null;
+    }
+
+    return {
+
+        id: user.id,
+
+        name: user.name,
+        email: user.email,
+
+        password: user.password,
+
+        role: user.role,
+        status: user.status,
+
+        buildLimit: user.build_limit,
+        exportLimit: user.export_limit,
+
+        buildsUsed: user.builds_used,
+        exportsUsed: user.exports_used,
+
+        createdAt: user.created_at,
+        lastLogin: user.last_login,
+
+        planId: user.plan_id,
+        bonusBuilds: user.bonus_builds,
+        bonusExports: user.bonus_exports
+
+    };
+
+}
+
 async function getUserById(id) {
+
     const result = await pool.query(
         `
         SELECT *
@@ -10,10 +46,12 @@ async function getUserById(id) {
         [id]
     );
 
-    return result.rows[0] || null;
+    return mapUser(result.rows[0]);
+
 }
 
 async function getUserByEmail(email) {
+
     const result = await pool.query(
         `
         SELECT *
@@ -23,10 +61,12 @@ async function getUserByEmail(email) {
         [email]
     );
 
-    return result.rows[0] || null;
+    return mapUser(result.rows[0]);
+
 }
 
 async function approveUser(email) {
+
     const result = await pool.query(
         `
         UPDATE users
@@ -37,10 +77,12 @@ async function approveUser(email) {
         [email]
     );
 
-    return result.rows[0] || null;
+    return mapUser(result.rows[0]);
+
 }
 
 async function setLimits(email, buildLimit, exportLimit) {
+
     const result = await pool.query(
         `
         UPDATE users
@@ -53,7 +95,8 @@ async function setLimits(email, buildLimit, exportLimit) {
         [email, buildLimit, exportLimit]
     );
 
-    return result.rows[0] || null;
+    return mapUser(result.rows[0]);
+
 }
 
 async function incrementBuildsUsed(id) {
@@ -68,7 +111,7 @@ async function incrementBuildsUsed(id) {
         [id]
     );
 
-    return result.rows[0] || null;
+    return mapUser(result.rows[0]);
 
 }
 
@@ -84,7 +127,7 @@ async function incrementExportsUsed(id) {
         [id]
     );
 
-    return result.rows[0] || null;
+    return mapUser(result.rows[0]);
 
 }
 
