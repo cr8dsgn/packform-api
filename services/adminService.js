@@ -5,6 +5,21 @@ function mapUser(user) {
         return null;
     }
 
+    const plan = user.plan || null;
+
+    const planBuildLimit = plan ? plan.buildLimit : 0;
+    const planExportLimit = plan ? plan.exportLimit : 0;
+
+    const effectiveBuildLimit =
+        planBuildLimit === -1
+            ? -1
+            : planBuildLimit + (user.bonusBuilds || 0);
+
+    const effectiveExportLimit =
+        planExportLimit === -1
+            ? -1
+            : planExportLimit + (user.bonusExports || 0);
+
     return {
         id: user.id,
         name: user.name,
@@ -13,14 +28,19 @@ function mapUser(user) {
         role: user.role,
         status: user.status,
 
-        buildLimit: user.build_limit,
-        exportLimit: user.export_limit,
+        plan: user.plan,
 
-        buildsUsed: user.builds_used,
-        exportsUsed: user.exports_used,
+        bonusBuilds: user.bonusBuilds,
+        bonusExports: user.bonusExports,
 
-        createdAt: user.created_at,
-        lastLogin: user.last_login
+        buildsUsed: user.buildsUsed,
+        exportsUsed: user.exportsUsed,
+
+        effectiveBuildLimit,
+        effectiveExportLimit,
+
+        createdAt: user.createdAt,
+        lastLogin: user.lastLogin
     };
 }
 
@@ -107,7 +127,7 @@ async function resetUsage(email) {
 
 }
 
-async function setLimits(email, buildLimit, exportLimit) {
+async function setLimits(email, bonusBuilds, bonusExports) {
 
     const user = await userRepository.findByEmail(email);
 
@@ -117,8 +137,8 @@ async function setLimits(email, buildLimit, exportLimit) {
 
     const updated = await userRepository.updateLimits(
         user.id,
-        buildLimit,
-        exportLimit
+        bonusBuilds,
+        bonusExports
     );
 
     return mapUser(updated);

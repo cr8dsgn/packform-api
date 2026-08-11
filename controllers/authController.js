@@ -40,8 +40,9 @@ async function register(req, res) {
         role: isFirstUser ? "Admin" : "Tester",
         status: isFirstUser ? "Active" : "Pending",
 
-        buildLimit: isFirstUser ? -1 : 3,
-        exportLimit: isFirstUser ? -1 : 3
+        planId: null,
+        bonusBuilds: 0,
+        bonusExports: 0
     });
 
     await userRepository.create(user);
@@ -58,17 +59,17 @@ async function login(req, res) {
 
     const { email, password } = req.body;
 
-    const user = await userRepository.findByEmail(email);
+    const authUser = await userRepository.findAuthByEmail(email);
 
     console.log("========== LOGIN ==========");
     console.log("EMAIL:", email);
-    console.log("USER FOUND:", !!user);
+    console.log("USER FOUND:", !!authUser);
 
-    if (user) {
-    console.log("DB EMAIL:", user.email);
+    if (authUser) {
+    console.log("DB EMAIL:", authUser.email);
     }
 
-    if (!user) {
+    if (!authUser) {
         return res.status(401).json({
             success: false,
             message: "Invalid email or password"
@@ -77,7 +78,7 @@ async function login(req, res) {
 
     const passwordValid = await bcrypt.compare(
         password,
-        user.password
+        authUser.password
     );
 
     console.log("PASSWORD VALID:", passwordValid);
@@ -89,21 +90,21 @@ async function login(req, res) {
         });
     }
 
-    if (user.status !== "Active") {
+    if (authUser.status !== "Active") {
         return res.status(403).json({
             success: false,
             message: "Your account is pending administrator approval.",
-            status: user.status
+            status: authUser.status
         });
     }
 
-    await userRepository.updateLastLogin(user.id);
+    await userRepository.updateLastLogin(authUser.id);
 
     const token = generateToken({
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        status: user.status
+        id: authUser.id,
+        email: authUser.email,
+        role: authUser.role,
+        status: authUser.status
     });
 
     return res.json({

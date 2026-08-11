@@ -1,0 +1,5 @@
+ALTER TABLE users
+DROP COLUMN IF EXISTS build_limit;
+
+ALTER TABLE users
+DROP COLUMN IF EXISTS export_limit;

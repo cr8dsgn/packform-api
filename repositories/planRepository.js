@@ -1,5 +1,21 @@
 const pool = require("../utils/postgres");
 
+function mapPlan(plan) {
+    if (!plan) return null;
+
+    return {
+        id: plan.id,
+        name: plan.name,
+        price: plan.price,
+        buildLimit: plan.build_limit,
+        exportLimit: plan.export_limit,
+        devicesLimit: plan.devices_limit,
+        displayOrder: plan.display_order,
+        isDefault: plan.is_default,
+        isActive: plan.is_active
+    };
+}
+
 async function findAll() {
 
     const result = await pool.query(
@@ -11,7 +27,7 @@ async function findAll() {
         `
     );
 
-    return result.rows;
+    return result.rows.map(mapPlan);
 
 }
 
@@ -26,7 +42,7 @@ async function findById(id) {
         [id]
     );
 
-    return result.rows[0] || null;
+    return mapPlan(result.rows[0]);
 
 }
 
@@ -41,7 +57,7 @@ async function findByName(name) {
         [name]
     );
 
-    return result.rows[0] || null;
+    return mapPlan(result.rows[0]);
 
 }
 
@@ -56,7 +72,7 @@ async function getDefaultPlan() {
         `
     );
 
-    return result.rows[0] || null;
+    return mapPlan(result.rows[0]);
 
 }
 
@@ -74,7 +90,7 @@ async function findByUserId(userId) {
         [userId]
     );
 
-    return result.rows[0] || null;
+    return mapPlan(result.rows[0]);
 
 }
 

@@ -1,133 +1,99 @@
-const pool = require("../utils/postgres");
+const userRepository = require("../repositories/userRepository");
 
-function mapUser(user) {
+function withEffectiveLimits(user) {
 
     if (!user) {
         return null;
     }
 
+    const plan = user.plan || null;
+
+    const planBuildLimit = plan ? plan.buildLimit : 0;
+    const planExportLimit = plan ? plan.exportLimit : 0;
+
+    const effectiveBuildLimit =
+        planBuildLimit === -1
+            ? -1
+            : planBuildLimit + (user.bonusBuilds || 0);
+
+    const effectiveExportLimit =
+        planExportLimit === -1
+            ? -1
+            : planExportLimit + (user.bonusExports || 0);
+
     return {
+        ...user,
 
-        id: user.id,
-
-        name: user.name,
-        email: user.email,
-
-        password: user.password,
-
-        role: user.role,
-        status: user.status,
-
-        buildLimit: user.build_limit,
-        exportLimit: user.export_limit,
-
-        buildsUsed: user.builds_used,
-        exportsUsed: user.exports_used,
-
-        createdAt: user.created_at,
-        lastLogin: user.last_login,
-
-        planId: user.plan_id,
-        bonusBuilds: user.bonus_builds,
-        bonusExports: user.bonus_exports
-
+        effectiveBuildLimit,
+        effectiveExportLimit
     };
 
 }
 
 async function getUserById(id) {
 
-    const result = await pool.query(
-        `
-        SELECT *
-        FROM users
-        WHERE id = $1
-        `,
-        [id]
-    );
+    const user = await userRepository.findById(id);
 
-    return mapUser(result.rows[0]);
+    return withEffectiveLimits(user);
 
 }
 
 async function getUserByEmail(email) {
 
-    const result = await pool.query(
-        `
-        SELECT *
-        FROM users
-        WHERE email = $1
-        `,
-        [email]
-    );
+    const user = await userRepository.findByEmail(email);
 
-    return mapUser(result.rows[0]);
+    return withEffectiveLimits(user);
 
 }
 
 async function approveUser(email) {
 
-    const result = await pool.query(
-        `
-        UPDATE users
-        SET status = 'Active'
-        WHERE email = $1
-        RETURNING *
-        `,
-        [email]
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    const updated = await userRepository.updateStatus(
+        user.id,
+        "Active"
     );
 
-    return mapUser(result.rows[0]);
+    return withEffectiveLimits(updated);
 
 }
 
-async function setLimits(email, buildLimit, exportLimit) {
+async function setLimits(email, bonusBuilds, bonusExports) {
 
-    const result = await pool.query(
-        `
-        UPDATE users
-        SET
-            build_limit = $2,
-            export_limit = $3
-        WHERE email = $1
-        RETURNING *
-        `,
-        [email, buildLimit, exportLimit]
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return null;
+    }
+
+    const updated = await userRepository.updateLimits(
+        user.id,
+        bonusBuilds,
+        bonusExports
     );
 
-    return mapUser(result.rows[0]);
+    return withEffectiveLimits(updated);
 
 }
 
 async function incrementBuildsUsed(id) {
 
-    const result = await pool.query(
-        `
-        UPDATE users
-        SET builds_used = builds_used + 1
-        WHERE id = $1
-        RETURNING *
-        `,
-        [id]
-    );
+    const updated = await userRepository.incrementBuildsUsed(id);
 
-    return mapUser(result.rows[0]);
+    return withEffectiveLimits(updated);
 
 }
 
 async function incrementExportsUsed(id) {
 
-    const result = await pool.query(
-        `
-        UPDATE users
-        SET exports_used = exports_used + 1
-        WHERE id = $1
-        RETURNING *
-        `,
-        [id]
-    );
+    const updated = await userRepository.incrementExportsUsed(id);
 
-    return mapUser(result.rows[0]);
+    return withEffectiveLimits(updated);
 
 }
 

@@ -25,10 +25,14 @@ async function me(req, res) {
             role: user.role,
             status: user.status,
 
+            createdAt: user.createdAt,
+            lastLogin: user.lastLogin,
+
+            plan: user.plan,
+
             usage: usageService.createUsage(user)
         }
     });
-
 }
 
 module.exports = {

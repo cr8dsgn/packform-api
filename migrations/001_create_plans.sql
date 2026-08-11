@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS plans (
 
     export_limit INTEGER NOT NULL,
 
+    devices_limit INTEGER NOT NULL DEFAULT 1,
+
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
 
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -26,6 +28,7 @@ INSERT INTO plans (
     price,
     build_limit,
     export_limit,
+    devices_limit,
     is_default,
     is_active,
     display_order
@@ -38,6 +41,7 @@ VALUES
     0,
     3,
     3,
+    1,
     TRUE,
     TRUE,
     1
@@ -49,6 +53,7 @@ VALUES
     20,
     25,
     25,
+    1,
     FALSE,
     TRUE,
     2
@@ -60,6 +65,7 @@ VALUES
     30,
     50,
     50,
+    1,
     FALSE,
     TRUE,
     3
@@ -68,9 +74,10 @@ VALUES
 (
     gen_random_uuid(),
     'Enterprise',
-    50,
+    100,
     -1,
     -1,
+    1,
     FALSE,
     TRUE,
     4
