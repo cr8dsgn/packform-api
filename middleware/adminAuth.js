@@ -1,6 +1,7 @@
 const { verifyToken } = require("../utils/jwt");
+const userService = require("../services/userService");
 
-function adminAuth(req, res, next) {
+async function adminAuth(req, res, next) {
 
     const authHeader = req.headers.authorization;
 
@@ -17,14 +18,33 @@ function adminAuth(req, res, next) {
 
         const payload = verifyToken(token);
 
-        if (payload.role !== "Admin") {
+        const user = await userService.getUserById(
+            payload.id
+        );
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        if (user.status !== "Active") {
+            return res.status(403).json({
+                success: false,
+                message: "User is blocked",
+                status: user.status
+            });
+        }
+
+        if (user.role !== "Admin") {
             return res.status(403).json({
                 success: false,
                 message: "Admin access required"
             });
         }
 
-        req.user = payload;
+        req.user = user;
 
         next();
 

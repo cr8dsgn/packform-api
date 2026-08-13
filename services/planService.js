@@ -82,12 +82,6 @@ async function assignPlan(userId, planId) {
 
     }
 
-    await userRepository.updateLimits(
-        userId,
-        plan.build_limit,
-        plan.export_limit
-    );
-
     return {
 
         success: true,
