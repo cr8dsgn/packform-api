@@ -1,5 +1,6 @@
 const planRepository = require("../repositories/planRepository");
 const userRepository = require("../repositories/userRepository");
+const userStateService = require("./userStateService");
 
 function mapPlan(plan) {
 
@@ -15,17 +16,17 @@ function mapPlan(plan) {
 
         priceMonthly: Number(plan.price),
 
-        buildLimit: plan.build_limit,
+        buildLimit: plan.buildLimit,
 
-        exportLimit: plan.export_limit,
+        exportLimit: plan.exportLimit,
 
-        isDefault: plan.is_default,
+        isDefault: plan.isDefault,
 
-        isActive: plan.is_active,
+        isActive: plan.isActive,
 
-        displayOrder: plan.display_order,
+        displayOrder: plan.displayOrder,
 
-        createdAt: plan.created_at
+        createdAt: plan.createdAt
 
     };
 
@@ -68,12 +69,38 @@ async function assignPlan(userId, planId) {
 
     }
 
-    const user = await userRepository.updatePlan(
-        userId,
-        planId
-    );
+    const user = await userRepository.findById(userId);
 
     if (!user) {
+
+        return {
+            success: false,
+            message: "User not found"
+        };
+
+    }
+
+    const state = userStateService.resolveStateForPlanChange(
+        user,
+        plan.name
+    );
+
+    if (!state.success) {
+
+        return {
+            success: false,
+            message: state.message
+        };
+
+    }
+
+    const updatedUser = await userRepository.updateRoleAndPlan(
+        userId,
+        state.role,
+        plan.id
+    );
+
+    if (!updatedUser) {
 
         return {
             success: false,
@@ -87,6 +114,8 @@ async function assignPlan(userId, planId) {
         success: true,
 
         userId,
+
+        role: updatedUser.role,
 
         plan: mapPlan(plan)
 

@@ -57,6 +57,23 @@ async function findAll() {
     return result.rows.map(mapUser);
 }
 
+async function findActiveAdmins() {
+
+    const result = await pool.query(`
+        SELECT
+            users.*,
+            row_to_json(plans) AS plan
+        FROM users
+        LEFT JOIN plans ON plans.id = users.plan_id
+        WHERE users.role = 'Admin'
+          AND users.status = 'Active'
+        ORDER BY users.created_at ASC
+    `);
+
+    return result.rows.map(mapUser);
+
+}
+
 async function findById(id) {
     const result = await pool.query(
         `
@@ -181,6 +198,46 @@ async function updateStatus(id, status) {
         RETURNING id
         `,
         [status, id]
+    );
+
+    if (!result.rows[0]) {
+        return null;
+    }
+
+    return findById(result.rows[0].id);
+}
+
+async function updateRole(id, role) {
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET role = $1
+        WHERE id = $2
+        RETURNING id
+        `,
+        [role, id]
+    );
+
+    if (!result.rows[0]) {
+        return null;
+    }
+
+    return findById(result.rows[0].id);
+}
+
+async function updateRoleAndPlan(id, role, planId) {
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET
+            role = $1,
+            plan_id = $2,
+            builds_used = 0,
+            exports_used = 0
+        WHERE id = $3
+        RETURNING id
+        `,
+        [role, planId, id]
     );
 
     if (!result.rows[0]) {
@@ -345,6 +402,7 @@ async function deleteByEmail(email) {
 module.exports = {
     countUsers,
     findAll,
+    findActiveAdmins,
     findById,
     findByEmail,
     findAuthByEmail,
@@ -352,6 +410,8 @@ module.exports = {
     deleteById,
     deleteByEmail,
     updateStatus,
+    updateRole,
+    updateRoleAndPlan,
     updateLimits,
     updatePlan,
     resetUsage,

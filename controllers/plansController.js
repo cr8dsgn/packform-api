@@ -1,4 +1,5 @@
 const planService = require("../services/planService");
+const rbacService = require("../services/rbacService");
 
 async function getPlans(req, res) {
 
@@ -41,6 +42,20 @@ async function assignPlan(req, res) {
         return res.status(400).json({
             success: false,
             message: "userId and planId are required"
+        });
+
+    }
+
+    const allowed = await rbacService.canChangePlan(
+        req.user.id,
+        userId
+    );
+
+    if (!allowed) {
+
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
         });
 
     }

@@ -81,6 +81,17 @@ async function setLimits(email, bonusBuilds, bonusExports) {
 
 }
 
+async function updateRole(id, role) {
+
+    const updated = await userRepository.updateRole(
+        id,
+        role
+    );
+
+    return withEffectiveLimits(updated);
+
+}
+
 async function incrementBuildsUsed(id) {
 
     const updated = await userRepository.incrementBuildsUsed(id);
@@ -102,6 +113,7 @@ module.exports = {
     getUserByEmail,
     approveUser,
     setLimits,
+    updateRole,
     incrementBuildsUsed,
     incrementExportsUsed
 };

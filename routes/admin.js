@@ -48,6 +48,12 @@ router.post(
 );
 
 router.post(
+    "/role",
+    adminAuth,
+    adminController.changeRole
+);
+
+router.post(
     "/delete",
     adminAuth,
     adminController.deleteUser

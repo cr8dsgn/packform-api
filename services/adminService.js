@@ -1,4 +1,5 @@
 const userRepository = require("../repositories/userRepository");
+const userStateService = require("./userStateService");
 
 function mapUser(user) {
     if (!user) {
@@ -41,7 +42,9 @@ function mapUser(user) {
 
         createdAt: user.createdAt,
         lastLogin: user.lastLogin
+
     };
+
 }
 
 async function getUsers() {
@@ -145,6 +148,68 @@ async function setLimits(email, bonusBuilds, bonusExports) {
 
 }
 
+async function getUserByEmail(email) {
+
+    const user = await userRepository.findByEmail(email);
+
+    return mapUser(user);
+
+}
+
+async function changeRole(email, newRole) {
+
+    const user = await userRepository.findByEmail(email);
+
+    if (!user) {
+        return {
+            success: false,
+            message: "User not found"
+        };
+    }
+
+    const state = userStateService.resolveStateForRoleChange(
+        user,
+        newRole
+    );
+
+    if (!state.success) {
+        return {
+            success: false,
+            message: state.message
+        };
+    }
+
+    const plan = await require("../repositories/planRepository").findByName(
+        state.plan
+    );
+
+    if (!plan) {
+        return {
+            success: false,
+            message: "Required plan not found"
+        };
+    }
+
+    const updated = await userRepository.updateRoleAndPlan(
+        user.id,
+        state.role,
+        plan.id
+    );
+
+    if (!updated) {
+        return {
+            success: false,
+            message: "User not found"
+        };
+    }
+
+    return {
+        success: true,
+        user: mapUser(updated)
+    };
+
+}
+
 async function deleteUser(email) {
 
     const user = await userRepository.deleteByEmail(email);
@@ -164,6 +229,8 @@ module.exports = {
     deleteUser,
     resetUsage,
     setLimits,
+    changeRole,
+    getUserByEmail,
     getUsers,
     getUserById
 };

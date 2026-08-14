@@ -1,4 +1,5 @@
 const adminService = require("../services/adminService");
+const rbacService = require("../services/rbacService");
 
 async function getUsers(req, res) {
 
@@ -145,9 +146,89 @@ async function setLimits(req, res) {
 
 }
 
+async function changeRole(req, res) {
+
+    const {
+        email,
+        role
+    } = req.body;
+
+    if (!email || !role) {
+        return res.status(400).json({
+            success: false,
+            message: "email and role are required"
+        });
+    }
+
+    const targetUser = await adminService.getUserByEmail(email);
+
+    if (!targetUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    const allowed = await rbacService.canChangeRole(
+        req.user.id,
+        targetUser.id
+    );
+
+    if (!allowed) {
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
+        });
+    }
+
+    const user = await adminService.changeRole(
+        email,
+        role
+    );
+
+    if (!user.success) {
+        return res.status(400).json(user);
+    }
+
+    return res.json({
+        success: true,
+        message: "Role updated",
+        user: user.user
+    });
+
+}
+
 async function deleteUser(req, res) {
 
     const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({
+            success: false,
+            message: "email is required"
+        });
+    }
+
+    const targetUser = await adminService.getUserByEmail(email);
+
+    if (!targetUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    const allowed = await rbacService.canDeleteUser(
+        req.user.id,
+        targetUser.id
+    );
+
+    if (!allowed) {
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
+        });
+    }
 
     const user = await adminService.deleteUser(email);
 
@@ -173,5 +254,6 @@ module.exports = {
     unblockUser,
     deleteUser,
     resetUsage,
-    setLimits
+    setLimits,
+    changeRole
 };
