@@ -254,9 +254,7 @@ async function updateLimits(id, bonusBuilds, bonusExports) {
         UPDATE users
         SET
             bonus_builds = $1,
-            bonus_exports = $2,
-            builds_used = 0,
-            exports_used = 0
+            bonus_exports = $2
         WHERE id = $3
         RETURNING id
         `,
