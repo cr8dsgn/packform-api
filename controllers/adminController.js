@@ -35,6 +35,27 @@ async function approveUser(req, res) {
 
     const { email } = req.body;
 
+    const targetUser = await adminService.getUserByEmail(email);
+
+    if (!targetUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    const allowed = await rbacService.canManageStatus(
+        req.user.id,
+        targetUser.id
+    );
+
+    if (!allowed) {
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
+        });
+    }
+
     const user = await adminService.approveUser(email);
 
     if (!user) {
@@ -55,6 +76,27 @@ async function approveUser(req, res) {
 async function blockUser(req, res) {
 
     const { email } = req.body;
+
+    const targetUser = await adminService.getUserByEmail(email);
+
+    if (!targetUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    const allowed = await rbacService.canManageStatus(
+        req.user.id,
+        targetUser.id
+    );
+
+    if (!allowed) {
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
+        });
+    }
 
     const user = await adminService.blockUser(email);
 
@@ -77,6 +119,27 @@ async function unblockUser(req, res) {
 
     const { email } = req.body;
 
+    const targetUser = await adminService.getUserByEmail(email);
+
+    if (!targetUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    const allowed = await rbacService.canManageStatus(
+        req.user.id,
+        targetUser.id
+    );
+
+    if (!allowed) {
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
+        });
+    }
+
     const user = await adminService.unblockUser(email);
 
     if (!user) {
@@ -97,6 +160,27 @@ async function unblockUser(req, res) {
 async function resetUsage(req, res) {
 
     const { email } = req.body;
+
+    const targetUser = await adminService.getUserByEmail(email);
+
+    if (!targetUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    const allowed = await rbacService.canManageStatus(
+        req.user.id,
+        targetUser.id
+    );
+
+    if (!allowed) {
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
+        });
+    }
 
     const user = await adminService.resetUsage(email);
 
@@ -123,6 +207,27 @@ async function setLimits(req, res) {
         buildLimit,
         exportLimit
     } = req.body;
+
+    const targetUser = await adminService.getUserByEmail(email);
+
+    if (!targetUser) {
+        return res.status(404).json({
+            success: false,
+            message: "User not found"
+        });
+    }
+
+    const allowed = await rbacService.canChangeBonus(
+        req.user.id,
+        targetUser.id
+    );
+
+    if (!allowed) {
+        return res.status(403).json({
+            success: false,
+            message: "Permission denied"
+        });
+    }
 
     const user = await adminService.setLimits(
         email,

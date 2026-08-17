@@ -5,7 +5,8 @@ const ACTIONS = {
     CHANGE_PLAN: "change_plan",
     CHANGE_BONUS: "change_bonus",
     CHANGE_ROLE: "change_role",
-    DELETE_USER: "delete_user"
+    DELETE_USER: "delete_user",
+    MANAGE_STATUS: "manage_status"
 };
 
 async function can(actorId, targetId, action) {
@@ -92,6 +93,20 @@ async function canChangeRole(actorId, targetId) {
 
 }
 
+async function canManageStatus(actorId, targetId) {
+
+    if (!actorId || !targetId || actorId === targetId) {
+        return false;
+    }
+
+    return can(
+        actorId,
+        targetId,
+        ACTIONS.MANAGE_STATUS
+    );
+
+}
+
 async function canDeleteUser(actorId, targetId) {
 
     return can(
@@ -109,5 +124,6 @@ module.exports = {
     canChangePlan,
     canChangeBonus,
     canChangeRole,
+    canManageStatus,
     canDeleteUser
 };
