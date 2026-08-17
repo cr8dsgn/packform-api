@@ -132,6 +132,13 @@ async function resetUsage(email) {
 
 async function setLimits(email, bonusBuilds, bonusExports) {
 
+    if (!Number.isFinite(bonusBuilds) || !Number.isFinite(bonusExports)) {
+        return {
+            validationError: true,
+            message: "buildLimit and exportLimit must both be finite numbers"
+        };
+    }
+
     const user = await userRepository.findByEmail(email);
 
     if (!user) {

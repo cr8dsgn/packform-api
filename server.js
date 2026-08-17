@@ -86,6 +86,31 @@ app.get("/health", (req, res) => {
     });
 });
 
+app.use((err, req, res, next) => {
+
+    if (err && err.message === "Origin not allowed") {
+        return res.status(403).json({
+            success: false,
+            message: "Origin not allowed"
+        });
+    }
+
+    if (err && err.type === "entity.parse.failed") {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid JSON"
+        });
+    }
+
+    console.error(err);
+
+    return res.status(err && err.status ? err.status : 500).json({
+        success: false,
+        message: "Internal server error"
+    });
+
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

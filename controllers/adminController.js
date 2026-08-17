@@ -35,6 +35,13 @@ async function approveUser(req, res) {
 
     const { email } = req.body;
 
+    if (!email) {
+        return res.status(400).json({
+            success: false,
+            message: "email is required"
+        });
+    }
+
     const targetUser = await adminService.getUserByEmail(email);
 
     if (!targetUser) {
@@ -76,6 +83,13 @@ async function approveUser(req, res) {
 async function blockUser(req, res) {
 
     const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({
+            success: false,
+            message: "email is required"
+        });
+    }
 
     const targetUser = await adminService.getUserByEmail(email);
 
@@ -119,6 +133,13 @@ async function unblockUser(req, res) {
 
     const { email } = req.body;
 
+    if (!email) {
+        return res.status(400).json({
+            success: false,
+            message: "email is required"
+        });
+    }
+
     const targetUser = await adminService.getUserByEmail(email);
 
     if (!targetUser) {
@@ -160,6 +181,13 @@ async function unblockUser(req, res) {
 async function resetUsage(req, res) {
 
     const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({
+            success: false,
+            message: "email is required"
+        });
+    }
 
     const targetUser = await adminService.getUserByEmail(email);
 
@@ -229,13 +257,20 @@ async function setLimits(req, res) {
         });
     }
 
-    const user = await adminService.setLimits(
+    const result = await adminService.setLimits(
         email,
         buildLimit,
         exportLimit
     );
 
-    if (!user) {
+    if (result && result.validationError) {
+        return res.status(400).json({
+            success: false,
+            message: result.message
+        });
+    }
+
+    if (!result) {
         return res.status(404).json({
             success: false,
             message: "User not found"
@@ -245,8 +280,8 @@ async function setLimits(req, res) {
     return res.json({
         success: true,
         message: "Limits updated",
-        buildLimit: user.buildLimit,
-        exportLimit: user.exportLimit
+        bonusBuilds: result.bonusBuilds,
+        bonusExports: result.bonusExports
     });
 
 }
