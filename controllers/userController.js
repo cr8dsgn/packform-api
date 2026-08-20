@@ -1,5 +1,6 @@
 const userService = require("../services/userService");
 const usageService = require("../services/usageService");
+const planService = require("../services/planService");
 
 async function me(req, res) {
 
@@ -35,6 +36,19 @@ async function me(req, res) {
     });
 }
 
+async function plans(req, res) {
+
+    const plans = await planService.getPlans();
+
+    return res.json({
+        success: true,
+        count: plans.length,
+        plans
+    });
+
+}
+
 module.exports = {
-    me
+    me,
+    plans
 };

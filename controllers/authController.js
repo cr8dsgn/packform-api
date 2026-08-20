@@ -38,7 +38,7 @@ async function register(req, res) {
         passwordHash,
 
         role: isFirstUser ? "Admin" : "Tester",
-        status: isFirstUser ? "Active" : "Pending",
+        status: "Active",
 
         planId: null,
         bonusBuilds: 0,

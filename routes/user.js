@@ -11,4 +11,10 @@ router.get(
     userController.me
 );
 
+router.get(
+    "/plans",
+    auth,
+    userController.plans
+);
+
 module.exports = router;
