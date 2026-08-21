@@ -48,7 +48,64 @@ async function plans(req, res) {
 
 }
 
+async function changePassword(req, res) {
+
+    const {
+        currentPassword,
+        newPassword
+    } = req.body;
+
+    if (!currentPassword || !newPassword) {
+
+        return res.status(400).json({
+            success: false,
+            message: "Current password and new password are required"
+        });
+
+    }
+
+    if (newPassword.length < 8) {
+
+        return res.status(400).json({
+            success: false,
+            message: "New password must be at least 8 characters"
+        });
+
+    }
+
+    if (currentPassword === newPassword) {
+
+        return res.status(400).json({
+            success: false,
+            message: "New password must be different from current password"
+        });
+
+    }
+
+    const result =
+        await userService.changePassword(
+            req.user.id,
+            currentPassword,
+            newPassword
+        );
+
+    if (!result.success) {
+
+        const status =
+            result.message === "User not found"
+                ? 404
+                : 401;
+
+        return res.status(status).json(result);
+
+    }
+
+    return res.json(result);
+
+}
+
 module.exports = {
     me,
-    plans
+    plans,
+    changePassword
 };

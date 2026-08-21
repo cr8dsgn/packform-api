@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 const userRepository = require("../repositories/userRepository");
 
 function withEffectiveLimits(user) {
@@ -108,6 +110,61 @@ async function incrementExportsUsed(id) {
 
 }
 
+async function changePassword(
+    id,
+    currentPassword,
+    newPassword
+) {
+
+    const authUser =
+        await userRepository.findAuthById(id);
+
+    if (!authUser) {
+        return {
+            success: false,
+            message: "User not found"
+        };
+    }
+
+    const passwordValid =
+        await bcrypt.compare(
+            currentPassword,
+            authUser.password
+        );
+
+    if (!passwordValid) {
+        return {
+            success: false,
+            message: "Current password is incorrect"
+        };
+    }
+
+    const passwordHash =
+        await bcrypt.hash(
+            newPassword,
+            10
+        );
+
+    const updatedUser =
+        await userRepository.updatePassword(
+            id,
+            passwordHash
+        );
+
+    if (!updatedUser) {
+        return {
+            success: false,
+            message: "Unable to update password"
+        };
+    }
+
+    return {
+        success: true,
+        message: "Password changed successfully"
+    };
+
+}
+
 module.exports = {
     getUserById,
     getUserByEmail,
@@ -115,5 +172,6 @@ module.exports = {
     setLimits,
     updateRole,
     incrementBuildsUsed,
-    incrementExportsUsed
+    incrementExportsUsed,
+    changePassword
 };

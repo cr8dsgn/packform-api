@@ -17,4 +17,10 @@ router.get(
     userController.plans
 );
 
+router.post(
+    "/change-password",
+    auth,
+    userController.changePassword
+);
+
 module.exports = router;

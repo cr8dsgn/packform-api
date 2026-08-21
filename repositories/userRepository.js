@@ -128,6 +128,25 @@ async function findAuthByEmail(email) {
     return result.rows[0] || null;
 }
 
+async function findAuthById(id) {
+
+    const result = await pool.query(
+        `
+        SELECT
+            id,
+            email,
+            password,
+            role,
+            status
+        FROM users
+        WHERE id = $1
+        `,
+        [id]
+    );
+
+    return result.rows[0] || null;
+}
+
 async function create(user) {
     const result = await pool.query(
         `
@@ -331,6 +350,26 @@ async function incrementExportsUsed(id) {
 
 }
 
+async function updatePassword(id, passwordHash) {
+
+    const result = await pool.query(
+        `
+        UPDATE users
+        SET password = $1
+        WHERE id = $2
+        RETURNING id
+        `,
+        [passwordHash, id]
+    );
+
+    if (!result.rows[0]) {
+        return null;
+    }
+
+    return findById(result.rows[0].id);
+
+}
+
 async function updateLastLogin(id) {
     await pool.query(
         `
@@ -404,6 +443,7 @@ module.exports = {
     findById,
     findByEmail,
     findAuthByEmail,
+    findAuthById,
     create,
     deleteById,
     deleteByEmail,
@@ -415,5 +455,6 @@ module.exports = {
     resetUsage,
     incrementBuildsUsed,
     incrementExportsUsed,
+    updatePassword,
     updateLastLogin
 };
