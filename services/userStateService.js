@@ -152,10 +152,18 @@ function resolveRoleForPlan(planName, currentRole) {
     }
 
     if (normalizedPlan === "Tester") {
+
+        if (normalizedCurrentRole === "Tester") {
+            return {
+                success: true,
+                role: "Tester",
+                plan: "Tester"
+            };
+        }
+
         return {
-            success: true,
-            role: "Tester",
-            plan: "Tester"
+            success: false,
+            message: "Cannot change to Tester plan from current role"
         };
     }
 

@@ -48,6 +48,67 @@ async function plans(req, res) {
 
 }
 
+async function changePlan(req, res) {
+
+    /*
+     * TEMPORARY BILLING PROTECTION
+     *
+     * Self-service plan changes are disabled until
+     * a real payment/subscription flow is connected.
+     *
+     * Admin plan assignment remains available through
+     * /api/plans/assign and its RBAC protection.
+     */
+
+    if (req.user.role !== "Admin") {
+
+        return res.status(403).json({
+            success: false,
+            message:
+                "Plan changes require an active subscription."
+        });
+
+    }
+
+    const { planId } = req.body;
+
+    if (!planId) {
+
+        return res.status(400).json({
+            success: false,
+            message: "planId is required"
+        });
+
+    }
+
+    const result = await planService.assignPlan(
+        req.user.id,
+        planId
+    );
+
+    if (!result.success) {
+
+        const status =
+            result.message === "User not found"
+                ? 404
+                : result.message === "Plan not found"
+                    ? 404
+                    : 400;
+
+        return res.status(status).json(result);
+
+    }
+
+    return res.json({
+        success: true,
+        message: "Plan updated successfully",
+        userId: result.userId,
+        role: result.role,
+        plan: result.plan
+    });
+
+}
+
 async function changePassword(req, res) {
 
     const {
@@ -107,5 +168,6 @@ async function changePassword(req, res) {
 module.exports = {
     me,
     plans,
-    changePassword
+    changePassword,
+    changePlan
 };

@@ -18,6 +18,12 @@ router.get(
 );
 
 router.post(
+    "/change-plan",
+    auth,
+    userController.changePlan
+);
+
+router.post(
     "/change-password",
     auth,
     userController.changePassword
